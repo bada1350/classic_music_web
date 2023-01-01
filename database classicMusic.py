@@ -5,6 +5,7 @@ db = connection.classicMusic
 
 music = db.musics
 
+# 데이터베이스에 저장되어 있는 데이터
 Beethoven = {
     "order": 1,
     "title": "베토벤",
@@ -223,9 +224,9 @@ Liszt = {
     ]
 }
 
-music.insert_one(Beethoven)
-music.insert_one(Mozart)
-music.insert_one(Bach)
-music.insert_one(Chopin)
-music.insert_one(Vivaldi)
-music.insert_one(Liszt)
+# music.insert_one(Beethoven)
+# music.insert_one(Mozart)
+# music.insert_one(Bach)
+# music.insert_one(Chopin)
+# music.insert_one(Vivaldi)
+# music.insert_one(Liszt)
