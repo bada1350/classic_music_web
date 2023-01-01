@@ -1,0 +1,25 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="jumbotron jumbotron-fluid">
+    <div class="container">
+    <h1 class="display-4">{{ title }}</h1>
+    <p class="lead">{{ intro }}</p>
+    </div>
+</div>
+<div class="row row-cols-1 row-cols-md-3 mx-5">
+    {% for s, c in zip(src, content) %}
+    <div class="col mb-4">
+        <div class="card h-100">
+            <a href="{{ s }}" target="_blank">
+                <img style="width: 100%; aspect-ratio: 1 / 1;" src="/static/EmptyImage.jpeg" class="card-img-top" alt="...">
+            </a>
+            <div class="card-body">
+                <a href="{{ s }}" target="_blank">
+                    <h5 class="card-title">{{ c }}</h5>
+                </a>
+            </div>
+        </div>
+    </div>
+    {% endfor %}
+</div>
+{% endblock %}
