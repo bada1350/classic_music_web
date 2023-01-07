@@ -1,8 +1,13 @@
 from flask import Flask, render_template, request
 from pymongo import MongoClient
 
-def router(NAME):
-    return render_template("{}.html".format(NAME))
+from flask_wtf import FlaskForm
+from wtforms import StringField
+from wtforms.validators import DataRequired
+
+class TextForm(FlaskForm):
+    content = StringField('콘텐츠', validators=[DataRequired()])
+    src = StringField('URL 주소', validators=[DataRequired()])
 
 app = Flask(__name__)
 app.config['SECRET_KEY'] = 'secret'
@@ -83,15 +88,33 @@ def liszt_music():
     src = musiclist[index]["src"]
     return render_template('liszt.html', title=title, intro=intro, href=href, content=content, src=src, zip=zip)
 
-@app.route('/admin', methods=['GET', 'POST'])
+@app.route('/admin', methods=['POST'])
 def admin_page():
-    if request.method == 'POST':
-        if request.form['id'] == 'admin' and request.form['password'] == 'password':
-            print(request.form['id'])
-            print(request.form['password'])
-            return render_template('admin.html')
-        else:
-            return "<script>window.location = document.referrer;</script>"
+    if request.form['id'] == 'admin' and request.form['password'] == 'password':
+        return render_template('admin.html')
+    else:
+        return "<script>window.location = document.referrer;</script>"
+
+@app.route('/admin/add', methods=['POST'])
+def add_music_page():
+    form = TextForm()
+    musics = music.find().sort("order")
+    return render_template('add_music.html', musics=musics, form=form)
+
+@app.route('/admin/add/action', methods=['GET', 'POST'])
+def add_music():
+    form = TextForm()
+    if form.validate_on_submit():
+        content = request.form['content']
+        src = request.form['src']
+        title = request.values.get('title')
+        index = music.find({"title": f"{title}"})[0]["order"] - 1
+        list_content = list(musiclist[index]['content'])
+        list_src =  list(musiclist[index]['src'])
+        list_content.append(content)
+        list_src.append(src)
+        music.update_one({"title": f"{title}"}, {"$set": {"content": list_content, "src": list_src}})
+    return "<script type='text/javascript'>location.href='/';</script>"
 
 if __name__ == '__main__':
     app.run()
