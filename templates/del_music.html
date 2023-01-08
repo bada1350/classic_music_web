@@ -1,0 +1,48 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="jumbotron jumbotron-fluid">
+    <div class="container">
+    <h1 class="display-4">관리자 모드 - 음악 삭제</h1>
+    <p class="lead">이곳에서 음악을 삭제할 수 있습니다.</p>
+    </div>
+</div>
+
+<div style="height: 80%;">
+    <div class="card shadow-lg mx-2 mt-2">
+        <div class="card-header font-weight-bold text-center">
+            삭제할 음악의 제목을 입력하세요.
+        </div>
+
+        <div class="card-body">
+            {% for music in musics %}
+            <p class="font-weight-bold">[{{ music["title"] }}]</p>
+            {% for content in music["content"] %}
+            <p>· {{ content }}</p>
+            {% endfor %}
+            {% endfor %}
+
+            <form action="/admin/del/action" method="POST">
+                {{ form.csrf_token }}
+                <div class="input mb-2">
+                    {{ form.content(class="form-control", placeholder="삭제할 콘텐츠의 제목을 입력하세요. ex) 베토벤 교향곡 1번") }}
+                </div>
+                
+                <div class="input-group">
+                    <select name="title" class="input-group-append form-control">
+                        <option selected disabled>삭제할 콘텐츠가 위치한 항목 선택</option>
+                        {% for item in items %}
+                        <option>{{ item["title"] }}</option>
+                        {% endfor %}
+                    </select>
+
+                    <div class="input-group-append">
+                        <button type="submit" class="btn btn-outline-secondary">
+                            삭제 <i class="fa fa-plus-circle fa-lg"></i>
+                        </button>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}

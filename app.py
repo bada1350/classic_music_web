@@ -15,6 +15,8 @@ connection = MongoClient('mongodb+srv://carl1350:pcRfM3Rm6ryaf9TX@cluster0.96ikt
 db = connection.classicMusic
 music = db.musics
 
+musiclist = music.find().sort("order")
+
 # 에러 처리
 @app.errorhandler(404)
 def error_404(error):
@@ -25,8 +27,6 @@ def error_404(error):
 def main_page():
     musics = music.find().sort("order")
     return render_template('index.html', musics=musics)
-
-musiclist = music.find().sort("order")
 
 @app.route('/beethoven')
 def beethoven_music():
@@ -95,11 +95,12 @@ def admin_page():
     else:
         return "<script>window.location = document.referrer;</script>"
 
+# 관리자 모드 - 음악 추가
 @app.route('/admin/add', methods=['POST'])
 def add_music_page():
     form = TextForm()
     musics = music.find().sort("order")
-    return render_template('add_music.html', musics=musics, form=form)
+    return render_template('add_music.html', form=form, musics=musics)
 
 @app.route('/admin/add/action', methods=['GET', 'POST'])
 def add_music():
@@ -115,6 +116,34 @@ def add_music():
         list_src.append(src)
         music.update_one({"title": f"{title}"}, {"$set": {"content": list_content, "src": list_src}})
     return "<script type='text/javascript'>location.href='/';</script>"
+
+# 관리자 모드 - 음악 삭제
+@app.route('/admin/del', methods=['POST'])
+def del_music_page():
+    form = TextForm()
+    musics = music.find().sort("order")
+    items = music.find().sort("order")
+    return render_template('del_music.html', form=form, musics=musics, items=items)
+
+@app.route('/admin/del/action', methods=['GET', 'POST'])
+def del_music():
+    if request.method == 'GET':
+        return "<script type='text/javascript'>location.href='/';</script>"
+    else:
+        try:
+            content = request.form['content']
+            title = request.values.get('title')
+            index = music.find({"title": f"{title}"})[0]["order"] - 1
+            list_content = list(musiclist[index]['content'])
+            list_src =  list(musiclist[index]['src'])
+            target_index = list_content.index(content)
+            del list_content[target_index]
+            del list_src[target_index]
+            music.update_one({"title": f"{title}"}, {"$set": {"content": list_content, "src": list_src}})
+            return "<script type='text/javascript'>location.href='/';</script>"
+        except:
+            # 해당 콘텐츠가 항목에 없는 경우
+            return render_template('page_del_error.html')
 
 if __name__ == '__main__':
     app.run()

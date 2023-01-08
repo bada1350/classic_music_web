@@ -17,18 +17,18 @@
             <form action="/admin/add/action" method="POST">
                 {{ form.csrf_token }}
                 <div class="input mb-2">
-                    {{ form.content(class="form-control", placeholder="제목을 입력하세요.") }}
+                    {{ form.content(class="form-control", placeholder="추가할 콘텐츠의 제목을 입력하세요.") }}
                 </div>
 
                 <div class="input mb-2">
-                    {{ form.src(class="form-control", placeholder="URL 주소를 입력하세요.") }}
+                    {{ form.src(class="form-control", placeholder="추가할 콘텐츠의 URL 주소를 입력하세요.") }}
                 </div>
                 
                 <div class="input-group">
                     <select name="title" class="input-group-append form-control">
                         <option selected disabled>작곡가 선택</option>
                         {% for music in musics %}
-                        <option>{{ music["title"]}}</option>
+                        <option>{{ music["title"] }}</option>
                         {% endfor %}
                     </select>
 
