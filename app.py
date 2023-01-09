@@ -8,6 +8,7 @@ from wtforms.validators import DataRequired
 class TextForm(FlaskForm):
     content = StringField('콘텐츠', validators=[DataRequired()])
     src = StringField('URL 주소', validators=[DataRequired()])
+    change = StringField('변경 후', validators=[DataRequired()])
 
 app = Flask(__name__)
 app.config['SECRET_KEY'] = 'secret'
@@ -102,19 +103,17 @@ def add_music_page():
     musics = music.find().sort("order")
     return render_template('add_music.html', form=form, musics=musics)
 
-@app.route('/admin/add/action', methods=['GET', 'POST'])
+@app.route('/admin/add/action', methods=['POST'])
 def add_music():
-    form = TextForm()
-    if form.validate_on_submit():
-        content = request.form['content']
-        src = request.form['src']
-        title = request.values.get('title')
-        index = music.find({"title": f"{title}"})[0]["order"] - 1
-        list_content = list(musiclist[index]['content'])
-        list_src =  list(musiclist[index]['src'])
-        list_content.append(content)
-        list_src.append(src)
-        music.update_one({"title": f"{title}"}, {"$set": {"content": list_content, "src": list_src}})
+    content = request.form['content']
+    src = request.form['src']
+    title = request.values.get('title')
+    index = music.find({"title": f"{title}"})[0]["order"] - 1
+    list_content = list(musiclist[index]['content'])
+    list_src =  list(musiclist[index]['src'])
+    list_content.append(content)
+    list_src.append(src)
+    music.update_one({"title": f"{title}"}, {"$set": {"content": list_content, "src": list_src}})
     return "<script type='text/javascript'>location.href='/';</script>"
 
 # 관리자 모드 - 음악 삭제
@@ -125,25 +124,49 @@ def del_music_page():
     items = music.find().sort("order")
     return render_template('del_music.html', form=form, musics=musics, items=items)
 
-@app.route('/admin/del/action', methods=['GET', 'POST'])
+@app.route('/admin/del/action', methods=['POST'])
 def del_music():
-    if request.method == 'GET':
+    try:
+        content = request.form['content']
+        title = request.values.get('title')
+        index = music.find({"title": f"{title}"})[0]["order"] - 1
+        list_content = list(musiclist[index]['content'])
+        list_src =  list(musiclist[index]['src'])
+        target_index = list_content.index(content)
+        del list_content[target_index]
+        del list_src[target_index]
+        music.update_one({"title": f"{title}"}, {"$set": {"content": list_content, "src": list_src}})
         return "<script type='text/javascript'>location.href='/';</script>"
-    else:
-        try:
-            content = request.form['content']
-            title = request.values.get('title')
-            index = music.find({"title": f"{title}"})[0]["order"] - 1
-            list_content = list(musiclist[index]['content'])
-            list_src =  list(musiclist[index]['src'])
-            target_index = list_content.index(content)
-            del list_content[target_index]
-            del list_src[target_index]
-            music.update_one({"title": f"{title}"}, {"$set": {"content": list_content, "src": list_src}})
-            return "<script type='text/javascript'>location.href='/';</script>"
-        except:
-            # 해당 콘텐츠가 항목에 없는 경우
-            return render_template('page_del_error.html')
+    except:
+        # 해당 콘텐츠가 항목에 없는 경우
+        return render_template('page_content_not_found.html')
+
+# 관리자 모드 - 음악 변경
+@app.route('/admin/change', methods=['POST'])
+def change_music_page():
+    form = TextForm()
+    musics = music.find().sort("order")
+    items = music.find().sort("order")
+    return render_template('change_music.html', form=form, musics=musics, items=items)
+
+@app.route('/admin/change/action', methods=['POST'])
+def change_music():
+    try:
+        content = request.form['content']
+        change = request.form['change']
+        src = request.form['src']
+        title = request.values.get('title')
+        index = music.find({"title": f"{title}"})[0]["order"] - 1
+        list_content = list(musiclist[index]['content'])
+        list_src =  list(musiclist[index]['src'])
+        target_index = list_content.index(content)
+        list_content[target_index] = change
+        list_src[target_index] = src
+        music.update_one({"title": f"{title}"}, {"$set": {"content": list_content, "src": list_src}})
+        return "<script type='text/javascript'>location.href='/';</script>"
+    except:
+        # 해당 콘텐츠가 항목에 없는 경우
+        return render_template('page_content_not_found.html')
 
 if __name__ == '__main__':
     app.run()
