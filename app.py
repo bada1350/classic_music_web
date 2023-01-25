@@ -29,6 +29,7 @@ def main_page():
     musics = music.find().sort("order")
     return render_template('index.html', musics=musics)
 
+# 베토벤
 @app.route('/beethoven')
 def beethoven_music():
     index = music.find({"href": "beethoven"})[0]["order"] - 1
@@ -39,6 +40,7 @@ def beethoven_music():
     src = musiclist[index]["src"]
     return render_template('beethoven.html', title=title, intro=intro, href=href, content=content, src=src, zip=zip)
 
+# 모차르트
 @app.route('/mozart')
 def mozart_music():
     index = music.find({"href": "mozart"})[0]["order"] - 1
@@ -49,6 +51,7 @@ def mozart_music():
     src = musiclist[index]["src"]
     return render_template('mozart.html', title=title, intro=intro, href=href, content=content, src=src, zip=zip)
 
+# 바흐
 @app.route('/bach')
 def bach_music():
     index = music.find({"href": "bach"})[0]["order"] - 1
@@ -59,6 +62,7 @@ def bach_music():
     src = musiclist[index]["src"]
     return render_template('bach.html', title=title, intro=intro, href=href, content=content, src=src, zip=zip)
 
+# 쇼팽
 @app.route('/chopin')
 def chopin_music():
     index = music.find({"href": "chopin"})[0]["order"] - 1
@@ -69,6 +73,7 @@ def chopin_music():
     src = musiclist[index]["src"]
     return render_template('chopin.html', title=title, intro=intro, href=href, content=content, src=src, zip=zip)
 
+# 비발디
 @app.route('/vivaldi')
 def vivaldi_music():
     index = music.find({"href": "vivaldi"})[0]["order"] - 1
@@ -79,6 +84,7 @@ def vivaldi_music():
     src = musiclist[index]["src"]
     return render_template('vivaldi.html', title=title, intro=intro, href=href, content=content, src=src, zip=zip)
 
+# 리스트
 @app.route('/liszt')
 def liszt_music():
     index = music.find({"href": "liszt"})[0]["order"] - 1
@@ -89,6 +95,7 @@ def liszt_music():
     src = musiclist[index]["src"]
     return render_template('liszt.html', title=title, intro=intro, href=href, content=content, src=src, zip=zip)
 
+# 관리자 페이지
 @app.route('/admin', methods=['POST'])
 def admin_page():
     if request.form['id'] == 'admin' and request.form['password'] == 'password':
@@ -138,7 +145,7 @@ def del_music():
         music.update_one({"title": f"{title}"}, {"$set": {"content": list_content, "src": list_src}})
         return "<script type='text/javascript'>location.href='/';</script>"
     except:
-        # 해당 콘텐츠가 항목에 없는 경우
+        # 에러 처리 - 해당 콘텐츠가 항목에 없는 경우
         return render_template('page_content_not_found.html')
 
 # 관리자 모드 - 음악 변경
@@ -165,7 +172,7 @@ def change_music():
         music.update_one({"title": f"{title}"}, {"$set": {"content": list_content, "src": list_src}})
         return "<script type='text/javascript'>location.href='/';</script>"
     except:
-        # 해당 콘텐츠가 항목에 없는 경우
+        # 에러 처리 - 해당 콘텐츠가 항목에 없는 경우
         return render_template('page_content_not_found.html')
 
 if __name__ == '__main__':
